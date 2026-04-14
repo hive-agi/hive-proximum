@@ -1,0 +1,54 @@
+{:tx-data
+ [{:db/ident       :entry/id
+   :db/valueType   :db.type/string
+   :db/cardinality :db.cardinality/one
+   :db/unique      :db.unique/identity
+   :db/doc         "Unique entry identifier (timestamped UUID string)"}
+
+  {:db/ident       :entry/type
+   :db/valueType   :db.type/keyword
+   :db/cardinality :db.cardinality/one
+   :db/index       true
+   :db/doc         "Entry type: :decision, :kanban, :plan, :session-summary, etc."}
+
+  {:db/ident       :entry/content
+   :db/valueType   :db.type/string
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Entry content (EDN-encoded for structured data, plain text otherwise)"}
+
+  {:db/ident       :entry/tags
+   :db/valueType   :db.type/string
+   :db/cardinality :db.cardinality/many
+   :db/index       true
+   :db/doc         "Tags for filtering and categorization"}
+
+  {:db/ident       :entry/content-hash
+   :db/valueType   :db.type/string
+   :db/cardinality :db.cardinality/one
+   :db/index       true
+   :db/doc         "SHA-256 hash of normalized content for dedup"}
+
+  {:db/ident       :entry/created-at
+   :db/valueType   :db.type/instant
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Creation timestamp (valid time)"}
+
+  {:db/ident       :entry/updated-at
+   :db/valueType   :db.type/instant
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Last update timestamp (valid time)"}
+
+  {:db/ident       :entry/deleted?
+   :db/valueType   :db.type/boolean
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Tombstone marker — true means logically deleted"}
+
+  {:db/ident       :entry/expires-at
+   :db/valueType   :db.type/instant
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Optional expiration timestamp"}
+
+  {:db/ident       :entry/source
+   :db/valueType   :db.type/string
+   :db/cardinality :db.cardinality/one
+   :db/doc         "Origin of entry (agent-id, user, system)"}]}

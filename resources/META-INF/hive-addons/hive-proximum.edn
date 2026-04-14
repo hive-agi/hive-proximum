@@ -1,0 +1,6 @@
+{:addon/id           "hive.proximum"
+ :addon/type         :native
+ :addon/init-ns      "hive-proximum.init"
+ :addon/init-fn      "init-as-addon!"
+ :addon/capabilities #{:memory-store :health-reporting}
+ :addon/description  "Proximum temporal/bitemporal memory backend (stub — awaiting backend impl)"}
