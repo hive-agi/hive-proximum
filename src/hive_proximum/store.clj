@@ -12,8 +12,9 @@
 
    Backend: Datahike 0.8.1667 (matches hive-mcp/hive-knowledge)"
   (:require [datahike.api :as d]
-            [hive-dsl.result :refer [guard]]
-            [taoensso.timbre :as log])
+            [hive-dsl.result :refer [guard rescue]]
+            [taoensso.timbre :as log]
+            [clojure.data.json :as json])
   (:import [java.util Date UUID]))
 
 ;; Copyright (C) 2026 Pedro Gomes Branquinho (BuddhiLW) <pedrogbranquinho@gmail.com>
@@ -115,22 +116,28 @@
       (apply str (map #(format "%02x" %) bytes)))))
 
 (defn entry->tx-data
-  "Convert entry map to Datahike transaction data."
+  "Convert entry map to Datahike transaction data.
+
+   `:entry/content` is canonically JSON-encoded so `entity->map` on read
+   can deserialize back to a Clojure map. Pre-encoded strings (e.g. JSON
+   produced by `memory-kanban`) pass through untouched."
   [{:keys [id type content tags content-hash source expires-at]}]
   (let [entry-id (or id (generate-id))
-        ts (now)]
+        ts (now)
+        encoded-content (when content
+                          (if (string? content) content (json/write-str content)))]
     (cond-> {:entry/id         entry-id
              :entry/created-at ts
              :entry/updated-at ts
              :entry/deleted?   false}
-      type         (assoc :entry/type (keyword type))
-      content      (assoc :entry/content (if (string? content) content (pr-str content)))
-      tags         (assoc :entry/tags (if (set? tags) tags (set (map str tags))))
-      content-hash (assoc :entry/content-hash content-hash)
+      type            (assoc :entry/type (keyword type))
+      encoded-content (assoc :entry/content encoded-content)
+      tags            (assoc :entry/tags (if (set? tags) tags (set (map str tags))))
+      content-hash    (assoc :entry/content-hash content-hash)
       (and content (not content-hash))
       (assoc :entry/content-hash (content->hash content))
-      source       (assoc :entry/source (str source))
-      expires-at   (assoc :entry/expires-at expires-at))))
+      source          (assoc :entry/source (str source))
+      expires-at      (assoc :entry/expires-at expires-at))))
 
 (defn pull-entry
   "Pull an entry from db, return nil if deleted or not found."
@@ -150,19 +157,44 @@
     (catch Exception _ nil)))
 
 (defn entity->map
-  "Convert Datahike entity map to clean entry map."
+  "Convert Datahike entity map to clean entry map.
+
+   `:entry/content` is stored as a JSON-encoded string by `add-entry!` /
+   `update-entry!` (see `entry->tx-data`). Parse it back to a Clojure map
+   on read so callers (e.g. kanban transitions) see structured content
+   without round-tripping through `json/read-str`. Non-JSON content
+   (legacy plain strings) is returned as-is."
   [e]
   (when e
-    (cond-> {:id           (:entry/id e)
-             :type         (:entry/type e)
-             :content      (:entry/content e)
-             :created-at   (:entry/created-at e)
-             :updated-at   (:entry/updated-at e)}
-      (:entry/tags e)         (assoc :tags (set (:entry/tags e)))
-      (:entry/content-hash e) (assoc :content-hash (:entry/content-hash e))
-      (:entry/source e)       (assoc :source (:entry/source e))
-      (:entry/expires-at e)   (assoc :expires-at (:entry/expires-at e))
-      (some? (:entry/deleted? e)) (assoc :deleted? (:entry/deleted? e)))))
+    (let [raw-content (:entry/content e)
+          parsed-content (if (and (string? raw-content)
+                                  (#{\{ \[} (first raw-content)))
+                           (rescue raw-content
+                                   (json/read-str raw-content :key-fn keyword))
+                           raw-content)]
+      (cond-> {:id           (:entry/id e)
+               :type         (:entry/type e)
+               :content      parsed-content
+               :created-at   (:entry/created-at e)
+               :updated-at   (:entry/updated-at e)}
+        (:entry/tags e)         (assoc :tags (set (:entry/tags e)))
+        (:entry/content-hash e) (assoc :content-hash (:entry/content-hash e))
+        (:entry/source e)       (assoc :source (:entry/source e))
+        (:entry/expires-at e)   (assoc :expires-at (:entry/expires-at e))
+        (some? (:entry/deleted? e)) (assoc :deleted? (:entry/deleted? e))))))
+
+(defn- apply-order-by
+  "Sort `entries` by `order-by` tuple `[field direction]`. `field` is a
+   keyword on the entry map (e.g. :created-at). `direction` is :asc or :desc.
+   When `order-by` is nil, falls back to `:created-at` ascending — preserves
+   the legacy behavior of the unconditional `(sort-by :created-at)` this
+   replaced."
+  [entries order-by]
+  (let [[field direction] (or order-by [:created-at :asc])
+        cmp (if (= direction :desc)
+              #(compare %2 %1)
+              compare)]
+    (sort-by field cmp entries)))
 
 ;; =============================================================================
 ;; ProximumStore defrecord
@@ -263,7 +295,7 @@
                                (assoc :entry/content
                                       (if (string? (:content updates))
                                         (:content updates)
-                                        (pr-str (:content updates))))
+                                        (json/write-str (:content updates))))
                                (:content updates)
                                (assoc :entry/content-hash
                                       (content->hash (:content updates)))
@@ -297,7 +329,7 @@
          (fn [this opts]
            (let [conn (ensure-conn! this)
                  db (d/db conn)
-                 {:keys [type tags limit]} opts
+                 {:keys [type tags limit order-by]} opts
                  results (cond
                            (and type tags)
                            (d/q '[:find [(pull ?e [*]) ...]
@@ -335,7 +367,7 @@
                                 db))]
              (->> results
                   (map entity->map)
-                  (sort-by :created-at)
+                  (#(apply-order-by % order-by))
                   (cond->> limit (take limit)))))
 
          :search-similar
