@@ -4,7 +4,7 @@
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
         io.github.hive-agi/hive-dsl
-        {:git/tag "v0.4.1" :git/sha "07ab02a16fc67ef6ca65a0c8f23b3cb322811649"}
+        {:git/tag "v0.5.1" :git/sha "335869e023e1bd5bf57c72be881baa647edf4a78"}
 
         ;; hive-events — event system for lifecycle
         io.github.hive-agi/hive-events
