@@ -10,12 +10,31 @@
         io.github.hive-agi/hive-events
         {:git/tag "v0.5.2" :git/sha "24a58a1"}
 
+        ;; hive-di — typed config (defconfig + env/file/coalesce sources).
+        ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
+        ;; the same tag as hive-mcp to avoid downstream classpath drift.
+        io.github.hive-agi/hive-di
+        {:git/tag "v0.3.1" :git/sha "ab63fd0"}
+
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
-        org.replikativ/datahike {:mvn/version "0.8.1671"}}
+        org.replikativ/datahike {:mvn/version "0.8.1671"}
+
+        ;; Proximum — persistent HNSW vector index. Powers the
+        ;; hive-proximum.vec.* namespaces (Phase 2 of the storage
+        ;; migration). hive-mcp depends on hive-proximum and late-binds
+        ;; to hive-proximum.vec.store/create-store via the slot factory.
+        org.replikativ/proximum {:mvn/version "0.1.24"}}
  :aliases
  {:test {:extra-paths ["test"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                       org.clojure/test.check {:mvn/version "1.1.1"}
                       io.github.hive-agi/hive-test
-                      {:git/tag "v0.2.1" :git/sha "48b480f"}}}}}
+                      {:git/tag "v0.2.1" :git/sha "48b480f"}}
+         ;; Proximum's HNSW vector ops use the JDK incubator vector
+         ;; module (jdk.incubator.vector.FloatVector). The module is
+         ;; opt-in — without --add-modules it's not on the runtime
+         ;; classpath and the `create-index` call throws a
+         ;; ClassNotFoundException for FloatVector.
+         :jvm-opts ["--add-modules=jdk.incubator.vector"
+                    "--enable-native-access=ALL-UNNAMED"]}}}
