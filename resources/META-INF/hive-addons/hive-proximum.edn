@@ -1,4 +1,5 @@
 {:addon/id           "hive.proximum"
+ :addon/kind         :library
  :addon/type         :native
  :addon/init-ns      "hive-proximum.init"
  :addon/init-fn      "init-as-addon!"
