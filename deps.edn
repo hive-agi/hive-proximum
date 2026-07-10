@@ -18,7 +18,7 @@
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
-        org.replikativ/datahike {:mvn/version "0.8.1671"}
+        org.replikativ/datahike {:mvn/version "0.8.1719"}
 
         ;; Proximum — persistent HNSW vector index. Powers the
         ;; hive-proximum.vec.* namespaces (Phase 2 of the storage
