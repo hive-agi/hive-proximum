@@ -3,18 +3,20 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl
-        {:git/tag "v0.5.2" :git/sha "8d9760c2f0cf210555db8b3d9fc47ce1af46d3f4"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.2"}
 
-        ;; hive-events — event system for lifecycle
+        ;; hive-events — event system for lifecycle.
+        ;; Still a git coord: hive-events is not on Clojars yet. Flip to
+        ;; {:mvn/version "..."} once it is published, otherwise hive-proximum
+        ;; cannot itself be released (a Maven artifact must not depend on a
+        ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:git/tag "v0.5.2" :git/sha "24a58a1"}
+        {:mvn/version "0.5.2"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
-        ;; the same tag as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di
-        {:git/tag "v0.3.1" :git/sha "ab63fd0"}
+        ;; the same version as hive-mcp to avoid downstream classpath drift.
+        io.github.hive-agi/hive-di {:mvn/version "0.3.1"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -26,7 +28,11 @@
         ;; to hive-proximum.vec.store/create-store via the slot factory.
         org.replikativ/proximum {:mvn/version "0.1.24"}}
  :aliases
- {:test {:extra-paths ["test"]
+ {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.9"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
+
+  :test {:extra-paths ["test"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                       org.clojure/test.check {:mvn/version "1.1.1"}
                       io.github.hive-agi/hive-test
