@@ -1,0 +1,6 @@
+{:lib      io.github.hive-agi/hive-proximum
+ :minor    1
+ :license  {:name "MIT" :url "https://opensource.org/licenses/MIT"}
+ :scm-url  "https://github.com/hive-agi/hive-proximum"
+ :src-dirs ["src"]
+ :publish  :clojars}

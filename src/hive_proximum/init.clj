@@ -163,6 +163,16 @@
 ;; Public API
 ;; =============================================================================
 
+(defn addon-ctor
+  "Pure constructor for the `hive.proximum` IAddon — (config -> IAddon | nil).
+   The mounter (hive-addon.mount) resolves this via :addon/init-fn; the host
+   then drives register!/initialize!. No registration or side effects. Returns
+   nil when the IAddon protocol is absent from the classpath (graceful).
+   Additive: the legacy self-registering `init-as-addon!` path is retained for
+   the current hive-mcp loader."
+  [_config]
+  (make-addon))
+
 (defn init-as-addon!
   "Register hive-proximum as an IAddon. Returns registration result."
   []
