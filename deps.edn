@@ -3,7 +3,7 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.6"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.7"}
 
         ;; hive-events — event system for lifecycle.
         ;; Still a git coord: hive-events is not on Clojars yet. Flip to
@@ -11,7 +11,7 @@
         ;; cannot itself be released (a Maven artifact must not depend on a
         ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:mvn/version "0.5.5"}
+        {:mvn/version "0.5.6"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
@@ -36,7 +36,7 @@
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                       org.clojure/test.check {:mvn/version "1.1.1"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.9"}}
+                      {:mvn/version "0.3.10"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime
