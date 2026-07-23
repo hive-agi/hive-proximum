@@ -3,7 +3,7 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.7"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.8"}
 
         ;; hive-events — event system for lifecycle.
         ;; Still a git coord: hive-events is not on Clojars yet. Flip to
