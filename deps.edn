@@ -3,7 +3,16 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.7"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.8"}
+
+        ;; Shared sealed WorldRef/Candidate value language.
+        io.github.hive-agi/hive-contracts {:mvn/version "0.2.0"}
+
+        ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
+        io.github.hive-agi/hive-spi {:mvn/version "0.1.12"}
+
+        ;; Value contracts at the candidate projection seam.
+        metosin/malli {:mvn/version "0.20.1"}
 
         ;; hive-events — event system for lifecycle.
         ;; Still a git coord: hive-events is not on Clojars yet. Flip to
@@ -26,7 +35,8 @@
         ;; hive-proximum.vec.* namespaces (Phase 2 of the storage
         ;; migration). hive-mcp depends on hive-proximum and late-binds
         ;; to hive-proximum.vec.store/create-store via the slot factory.
-        org.replikativ/proximum {:mvn/version "0.1.24"}}
+        org.replikativ/proximum {:mvn/version "0.1.24"}
+        org.clojure/data.json {:mvn/version "2.5.1"}}
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.9"}
                  slipset/deps-deploy {:mvn/version "0.2.2"}}
@@ -35,12 +45,19 @@
   :test {:extra-paths ["test"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                       org.clojure/test.check {:mvn/version "1.1.1"}
+                      com.gfredericks/test.chuck
+                      {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.10"}}
+                      {:mvn/version "0.3.10"}
+                      io.github.hive-agi/hive-schemas
+                      {:mvn/version "0.1.10"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime
          ;; classpath and the `create-index` call throws a
          ;; ClassNotFoundException for FloatVector.
          :jvm-opts ["--add-modules=jdk.incubator.vector"
-                    "--enable-native-access=ALL-UNNAMED"]}}}
+                    "--enable-native-access=ALL-UNNAMED"]}
+  :benchmark {:jvm-opts ["--add-modules=jdk.incubator.vector"
+            "--enable-native-access=ALL-UNNAMED"]
+ :main-opts ["-m" "hive-proximum.candidate.qdrant-pilot"]}}}

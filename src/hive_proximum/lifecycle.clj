@@ -5,9 +5,9 @@
    releasing the Datahike connection, and may share a classloader path
    with other datahike-backed stores that need to settle first.
 
-   Zero compile-time coupling to hive-mcp shutdown internals beyond the
-   IShutdownHook protocol and the registry — matches the runtime-
-   resolve pattern used in `hive-proximum.init` for IAddon bits.
+   Binds IShutdownHook and the lifecycle registry from hive-spi, so there is
+   no compile-time coupling to hive-mcp at all. The memory ports are reached
+   by runtime resolve, matching `hive-proximum.init`.
 
    Sync+close sequence:
      1. (hive-proximum.state/get-handle)  — snapshot backend handle
@@ -21,8 +21,8 @@
   ;; Copyright (C) 2026 Pedro Gomes Branquinho (BuddhiLW) <pedrogbranquinho@gmail.com>
   ;;
   ;; SPDX-License-Identifier: MIT
-  (:require [hive-mcp.protocols.lifecycle :as lifecycle]
-            [hive-mcp.system.registry :as reg]
+  (:require [hive-spi.lifecycle.ports :as lifecycle]
+            [hive-spi.lifecycle.registry :as reg]
             [hive-proximum.state :as state]
             [taoensso.timbre :as log]))
 
@@ -39,8 +39,8 @@
    the registered :proximum store. Returns :ok on success, :skipped
    when the registry or store is not available."
   []
-  (let [get-store   (try-resolve 'hive-mcp.protocols.memory/get-store)
-        disconnect! (try-resolve 'hive-mcp.protocols.memory/disconnect!)]
+  (let [get-store   (try-resolve 'hive-spi.memory.registry/get-store)
+        disconnect! (try-resolve 'hive-spi.memory.ports/disconnect!)]
     (if (and get-store disconnect!)
       (if-let [store (get-store :proximum)]
         (do (disconnect! store) :ok)
@@ -74,7 +74,7 @@
 ;; =============================================================================
 
 (defn install! []
-  (reg/register-shutdown! (->ProximumShutdown)))
+  (reg/register-shutdown! "proximum/sync-and-close" (->ProximumShutdown)))
 
 ;; Auto-register on ns load. `hive-proximum.init/init-as-addon!` or
 ;; hive-mcp `system/layer1` will require this ns; the defonce ensures
