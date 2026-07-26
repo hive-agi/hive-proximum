@@ -5,13 +5,9 @@
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
         io.github.hive-agi/hive-dsl {:mvn/version "0.5.8"}
 
-        ;; Shared sealed WorldRef/Candidate value language.
-        io.github.hive-agi/hive-contracts {:mvn/version "0.2.0"}
-
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
         io.github.hive-agi/hive-spi {:mvn/version "0.1.12"}
 
-        ;; Value contracts at the candidate projection seam.
         metosin/malli {:mvn/version "0.20.1"}
 
         ;; hive-events — event system for lifecycle.
@@ -57,7 +53,4 @@
          ;; classpath and the `create-index` call throws a
          ;; ClassNotFoundException for FloatVector.
          :jvm-opts ["--add-modules=jdk.incubator.vector"
-                    "--enable-native-access=ALL-UNNAMED"]}
-  :benchmark {:jvm-opts ["--add-modules=jdk.incubator.vector"
-            "--enable-native-access=ALL-UNNAMED"]
- :main-opts ["-m" "hive-proximum.candidate.qdrant-pilot"]}}}
+                    "--enable-native-access=ALL-UNNAMED"]}}}
