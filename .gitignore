@@ -3,3 +3,4 @@
 .cpcache/
 target/
 .nrepl-port
+local.deps.edn
