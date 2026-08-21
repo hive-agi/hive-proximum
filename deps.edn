@@ -3,7 +3,7 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.15"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.16"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
         io.github.hive-agi/hive-spi {:mvn/version "0.1.20"}
@@ -16,12 +16,12 @@
         ;; cannot itself be released (a Maven artifact must not depend on a
         ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:mvn/version "0.5.6"}
+        {:mvn/version "0.5.7"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
         ;; the same version as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di {:mvn/version "0.4.3"}
+        io.github.hive-agi/hive-di {:mvn/version "0.4.4"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -34,7 +34,7 @@
         org.replikativ/proximum {:mvn/version "0.1.35"}
         org.clojure/data.json {:mvn/version "2.5.2"}}
  :aliases
- {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.9"}}
+ {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.10"}}
           :ns-default hive-build.api}
 
   :test {:extra-paths ["test"]
@@ -43,9 +43,9 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.12"}
+                      {:mvn/version "0.3.14"}
                       io.github.hive-agi/hive-schemas
-                      {:mvn/version "0.1.14"}}
+                      {:mvn/version "0.1.15"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime
