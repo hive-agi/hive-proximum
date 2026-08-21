@@ -1,5 +1,5 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.12.1"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.5"}
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
@@ -32,14 +32,14 @@
         ;; migration). hive-mcp depends on hive-proximum and late-binds
         ;; to hive-proximum.vec.store/create-store via the slot factory.
         org.replikativ/proximum {:mvn/version "0.1.35"}
-        org.clojure/data.json {:mvn/version "2.5.1"}}
+        org.clojure/data.json {:mvn/version "2.5.2"}}
  :aliases
  {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.8"}}
           :ns-default hive-build.api}
 
   :test {:extra-paths ["test"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
-                      org.clojure/test.check {:mvn/version "1.1.1"}
+                      org.clojure/test.check {:mvn/version "1.1.3"}
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
