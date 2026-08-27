@@ -3,10 +3,10 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.16"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.17"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
-        io.github.hive-agi/hive-spi {:mvn/version "0.1.20"}
+        io.github.hive-agi/hive-spi {:mvn/version "0.2.0"}
 
         metosin/malli {:mvn/version "0.20.1"}
 
@@ -16,12 +16,12 @@
         ;; cannot itself be released (a Maven artifact must not depend on a
         ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:mvn/version "0.5.7"}
+        {:mvn/version "0.5.8"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
         ;; the same version as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di {:mvn/version "0.4.4"}
+        io.github.hive-agi/hive-di {:mvn/version "0.4.5"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -43,9 +43,9 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.14"}
+                      {:mvn/version "0.3.15"}
                       io.github.hive-agi/hive-schemas
-                      {:mvn/version "0.1.15"}}
+                      {:mvn/version "0.1.26"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime

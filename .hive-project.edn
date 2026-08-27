@@ -3,4 +3,4 @@
  :description "Proximum-backed vector store — store + vec protocol/config, init and lifecycle. A loadable storage backend carrying no hive-mcp dependency."
  :language :clojure
  :tags ["storage-backend" "vector-db" "proximum" "spi-impl"]
- :carto {:source-roots ["src" "test"]}}
+ :carto {:source-roots ["resources" "src" "test"]}}
