@@ -10,7 +10,8 @@
    Usage:
      ;; Via addon system (auto-discovered from META-INF manifest):
      (init-as-addon!)"
-  (:require [hive-proximum.state :as state]
+  (:require [hive-addon.protocol :as addon]
+            [hive-proximum.state :as state]
             [hive-proximum.store :as store]
             [hive-dsl.result :refer [guard]]
             [taoensso.timbre :as log]))
@@ -40,13 +41,11 @@
 (defonce ^:private addon-instance (atom nil))
 
 (defn- make-addon
-  "Create an IAddon reify for hive-proximum.
-   Returns nil if protocol is not on classpath."
+  "Create an IAddon reify for hive-proximum."
   []
-  (when (try-resolve 'hive-mcp.addons.protocol/IAddon)
-    (let [state (atom {:initialized? false})]
-      (reify
-        hive-mcp.addons.protocol/IAddon
+  (let [state (atom {:initialized? false})]
+    (reify
+      addon/IAddon
 
         (addon-id [_] "hive.proximum")
 
@@ -109,7 +108,7 @@
                          :store-type :datahike
                          :connected? (boolean store-healthy?)}})
             {:status :down
-             :details {:reason "not initialized"}}))))))
+             :details {:reason "not initialized"}})))))
 
 ;; =============================================================================
 ;; Dep Registry + Nil-Railway Pipeline
