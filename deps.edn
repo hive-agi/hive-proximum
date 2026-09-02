@@ -3,7 +3,7 @@
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.20"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.21"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
         io.github.hive-agi/hive-spi {:mvn/version "0.2.0"}
@@ -21,7 +21,7 @@
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
         ;; the same version as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di {:mvn/version "0.4.7"}
+        io.github.hive-agi/hive-di {:mvn/version "0.4.8"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -43,7 +43,7 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.16"}
+                      {:mvn/version "0.3.17"}
                       io.github.hive-agi/hive-schemas
                       {:mvn/version "0.1.29"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
