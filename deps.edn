@@ -5,13 +5,13 @@
         ;; hive-addon: the IAddon contract this addon implements. Depending on
         ;; the contract lib rather than on a host namespace is what lets any
         ;; host, hive-mcp or not, mount this jar.
-        io.github.hive-agi/hive-addon {:mvn/version "0.3.10"}
+        io.github.hive-agi/hive-addon {:mvn/version "1.0.0"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
         io.github.hive-agi/hive-dsl {:mvn/version "0.5.21"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
-        io.github.hive-agi/hive-spi {:mvn/version "0.2.0"}
+        io.github.hive-agi/hive-spi {:mvn/version "1.0.0"}
 
         metosin/malli {:mvn/version "0.20.1"}
 
@@ -21,7 +21,7 @@
         ;; cannot itself be released (a Maven artifact must not depend on a
         ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:mvn/version "0.5.9"}
+        {:mvn/version "0.5.10"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
@@ -48,7 +48,7 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.3.17"}
+                      {:mvn/version "0.4.0"}
                       io.github.hive-agi/hive-schemas
                       {:mvn/version "0.1.29"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
