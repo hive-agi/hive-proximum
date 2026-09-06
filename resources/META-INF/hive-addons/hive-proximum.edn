@@ -4,4 +4,6 @@
  :addon/init-ns      "hive-proximum.init"
  :addon/init-fn      "addon-ctor"
  :addon/capabilities #{:memory-store :health-reporting}
- :addon/description  "Proximum temporal/bitemporal memory backend (stub — awaiting backend impl)"}
+ :addon/description  "Proximum temporal/bitemporal memory backend (stub — awaiting backend impl)"
+ :addon/maturity :experimental
+ :addon/trust-class :foss}
