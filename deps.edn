@@ -1,17 +1,17 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.12.5"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.6"}
         com.taoensso/timbre {:mvn/version "6.8.0"}
 
         ;; hive-addon: the IAddon contract this addon implements. Depending on
         ;; the contract lib rather than on a host namespace is what lets any
         ;; host, hive-mcp or not, mount this jar.
-        io.github.hive-agi/hive-addon {:mvn/version "1.0.4"}
+        io.github.hive-agi/hive-addon {:mvn/version "1.0.10"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.24"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.27"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
-        io.github.hive-agi/hive-spi {:mvn/version "1.1.0"}
+        io.github.hive-agi/hive-spi {:mvn/version "1.1.1"}
 
         metosin/malli {:mvn/version "0.20.1"}
 
@@ -21,12 +21,12 @@
         ;; cannot itself be released (a Maven artifact must not depend on a
         ;; git coord — the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
-        {:mvn/version "0.5.13"}
+        {:mvn/version "0.5.14"}
 
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
         ;; the same version as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di {:mvn/version "0.4.11"}
+        io.github.hive-agi/hive-di {:mvn/version "0.4.12"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -39,7 +39,7 @@
         org.replikativ/proximum {:mvn/version "0.1.38"}
         org.clojure/data.json {:mvn/version "2.5.2"}}
  :aliases
- {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.15"}}
+ {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.17"}}
           :ns-default hive-build.api}
 
   :test {:extra-paths ["test"]
@@ -48,9 +48,9 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.4.4"}
+                      {:mvn/version "0.4.5"}
                       io.github.hive-agi/hive-schemas
-                      {:mvn/version "0.1.32"}}
+                      {:mvn/version "0.1.34"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime
