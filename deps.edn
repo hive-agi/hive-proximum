@@ -5,13 +5,13 @@
         ;; hive-addon: the IAddon contract this addon implements. Depending on
         ;; the contract lib rather than on a host namespace is what lets any
         ;; host, hive-mcp or not, mount this jar.
-        io.github.hive-agi/hive-addon {:mvn/version "1.0.13"}
+        io.github.hive-agi/hive-addon {:mvn/version "1.0.14"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.30"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.31"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
-        io.github.hive-agi/hive-spi {:mvn/version "1.2.0"}
+        io.github.hive-agi/hive-spi {:mvn/version "1.3.0"}
 
         metosin/malli {:mvn/version "0.20.1"}
 
@@ -26,7 +26,7 @@
         ;; hive-di — typed config (defconfig + env/file/coalesce sources).
         ;; Used by hive-proximum.vec.config/ProximumVecConfig. Pinned to
         ;; the same version as hive-mcp to avoid downstream classpath drift.
-        io.github.hive-agi/hive-di {:mvn/version "0.4.15"}
+        io.github.hive-agi/hive-di {:mvn/version "0.4.16"}
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
@@ -39,7 +39,7 @@
         org.replikativ/proximum {:mvn/version "0.1.38"}
         org.clojure/data.json {:mvn/version "2.5.2"}}
  :aliases
- {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.21"}}
+ {:build {:deps {io.github.hive-agi/hive-build {:mvn/version "0.1.22"}}
           :ns-default hive-build.api}
 
   :test {:extra-paths ["test"]
@@ -48,9 +48,9 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.4.8"}
+                      {:mvn/version "0.4.9"}
                       io.github.hive-agi/hive-schemas
-                      {:mvn/version "0.1.36"}}
+                      {:mvn/version "0.1.37"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
          ;; module (jdk.incubator.vector.FloatVector). The module is
          ;; opt-in — without --add-modules it's not on the runtime
