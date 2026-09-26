@@ -13,7 +13,7 @@
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
         io.github.hive-agi/hive-spi {:mvn/version "1.4.1"}
 
-        metosin/malli {:mvn/version "0.20.1"}
+        metosin/malli {:mvn/version "0.20.2"}
 
         ;; hive-events — event system for lifecycle.
         ;; Still a git coord: hive-events is not on Clojars yet. Flip to
@@ -30,7 +30,7 @@
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
-        org.replikativ/datahike {:mvn/version "0.8.1895"}
+        org.replikativ/datahike {:mvn/version "0.8.1899"}
 
         ;; Proximum — persistent HNSW vector index. Powers the
         ;; hive-proximum.vec.* namespaces (Phase 2 of the storage
