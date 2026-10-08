@@ -40,7 +40,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          # proximum >= 0.1.38 ships class-file major 66 (JDK 22+); on 21 the
+          # late-bound requiring-resolve fails silently and the store no-ops.
+          java-version: '25'
 
       - name: Setup Clojure CLI
         run: |
