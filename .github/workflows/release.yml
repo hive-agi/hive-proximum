@@ -26,6 +26,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Same JDK as staging-gate: proximum >= 0.1.38 is class-file major 66
+      # (JDK 22+), so the pre-mint test step fails on the runner default.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
       - uses: DeLaGuardo/setup-clojure@13.0
         with:
           cli: latest

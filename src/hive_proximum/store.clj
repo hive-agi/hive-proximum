@@ -7,14 +7,21 @@
    - Deletes set :entry/deleted? true (tombstone, never hard-delete)
    - Temporal queries use d/as-of and d/history for time-travel
 
-   Protocol extension uses `extend` (function, not macro) to avoid
-   compile-time dependency on hive-mcp.protocols.memory.
+   Protocol extension uses `extend` (function, not macro) over the
+   hive-spi.memory.ports protocols; no dependency on hive-mcp.
+
+   Seal readiness: store-status declares :capabilities [:embed-text] and the
+   transient :embed-text is never persisted (`strip-transient`);
+   IMemoryStoreScan's scan-ids enumerates every live id from one immutable
+   db snapshot.
 
    Backend: Datahike 0.8.1667 (matches hive-mcp/hive-knowledge)"
   (:require [datahike.api :as d]
             [hive-dsl.result :refer [guard rescue]]
             [taoensso.timbre :as log]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [hive-spi.memory.entry :as entry]
+            [hive-spi.memory.ports :as ports])
   (:import [java.util Date UUID]))
 
 ;; Copyright (C) 2026 Pedro Gomes Branquinho (BuddhiLW) <pedrogbranquinho@gmail.com>
@@ -115,14 +122,74 @@
           bytes (.digest md (.getBytes ^String s "UTF-8"))]
       (apply str (map #(format "%02x" %) bytes)))))
 
+(def capabilities
+  "What callers may rely on beyond the IMemoryStore port, declared under
+   :capabilities in store-status (the hive-spi.memory.decorate contract).
+
+   :embed-text  an entry's transient :embed-text is never persisted, under
+                any spelling or depth (`strip-transient`). This store does
+                not embed (supports-semantic-search? is false), so there is
+                no index the ciphertext of a sealing decorator could reach;
+                the text it hands over is dropped."
+  [:embed-text])
+
+(defn- transient-key?
+  "True for a key naming the transient embed-text field under any spelling:
+   the keyword :embed-text in any namespace, the string \"embed-text\" or the
+   symbol embed-text. JSON-encoded content writes every key by its name, so
+   each spelling would land in the same field."
+  [k]
+  (and (or (keyword? k) (string? k) (symbol? k))
+       (= "embed-text" (name k))))
+
+(defn strip-transient
+  "X without its transient embed-text keys, at every depth: dropped from X
+   when X is a map and from every map nested in X, through maps, sequences
+   and sets. :embed-text is embedding input only; persisting it would store
+   the plaintext a sealing decorator encrypted. A value with nothing to drop
+   comes back identical, and a collection holding no collection is not
+   walked."
+  [x]
+  (cond
+    (map? x)
+    (reduce-kv (fn [m k v]
+                 (if (transient-key? k)
+                   (dissoc m k)
+                   (let [v' (strip-transient v)]
+                     (if (identical? v v') m (assoc m k v')))))
+               x x)
+
+    (and (coll? x) (some coll? x))
+    (cond
+      (vector? x) (mapv strip-transient x)
+      (set? x)    (into (empty x) (map strip-transient) x)
+      :else       (apply list (map strip-transient x)))
+
+    :else x))
+
+(defn- expires->date
+  "The expiry of an entry as a Date: :expires-at when it is one, else the
+   port's ISO-8601 :expires string parsed; nil when neither is usable."
+  [{:keys [expires-at expires]}]
+  (cond
+    (instance? Date expires-at) expires-at
+    (instance? java.time.Instant expires-at) (Date/from expires-at)
+    :else (some-> (entry/parse-instant expires) Date/from)))
+
 (defn entry->tx-data
   "Convert entry map to Datahike transaction data.
 
    `:entry/content` is canonically JSON-encoded so `entity->map` on read
    can deserialize back to a Clojure map. Pre-encoded strings (e.g. JSON
-   produced by `memory-kanban`) pass through untouched."
-  [{:keys [id type content tags content-hash source expires-at]}]
-  (let [entry-id (or id (generate-id))
+   produced by `memory-kanban`) pass through untouched.
+
+   The transient :embed-text is stripped first, at every depth
+   (`strip-transient`), so it never reaches the fact log. The expiry is
+   taken from :expires-at, or from the port's ISO-8601 :expires string."
+  [raw-entry]
+  (let [{:keys [id type content tags content-hash source] :as e} (strip-transient raw-entry)
+        expires-at (expires->date e)
+        entry-id (or id (generate-id))
         ts (now)
         encoded-content (when content
                           (if (string? content) content (json/write-str content)))]
@@ -220,14 +287,41 @@
 
 (defonce ^:private -protocols-extended? (atom false))
 
+(defn scan-ids
+  "Every live (not tombstoned) entry id in STORE, each once. Opts:
+   :include-expired? (default false) also lists entries whose expiry has
+   passed. One Datahike db value is an immutable snapshot, so a single read
+   is the whole store; a failure to read it throws, it never answers short."
+  [store {:keys [include-expired?]}]
+  (let [db  (d/db (ensure-conn! store))
+        t   (now)
+        ids (if include-expired?
+              (d/q '[:find [?id ...]
+                     :where
+                     [?e :entry/id ?id]
+                     [?e :entry/deleted? false]]
+                   db)
+              (d/q '[:find [?id ...]
+                     :in $ ?now
+                     :where
+                     [?e :entry/id ?id]
+                     [?e :entry/deleted? false]
+                     (not-join [?e ?now]
+                       [?e :entry/expires-at ?exp]
+                       [(< ?exp ?now)])]
+                   db t))]
+    (vec (distinct ids))))
+
 (defn extend-store-protocols!
-  "Extend ProximumStore with IMemoryStore + IMemoryStoreTemporal.
-   Uses `extend` (function) — protocol resolution is fully runtime.
+  "Extend ProximumStore with IMemoryStore, IMemoryStoreScan and
+   IMemoryStoreTemporal, the hive-spi.memory.ports protocols (hive-mcp's
+   hive-mcp.protocols.memory re-exports the same protocol values).
+   Uses `extend` (function).
    Safe to call multiple times (idempotent via atom guard)."
   []
   (when (compare-and-set! -protocols-extended? false true)
     ;; IMemoryStore
-    (when-let [proto-var (try-resolve 'hive-mcp.protocols.memory/IMemoryStore)]
+    (when-let [proto-var (try-resolve 'hive-spi.memory.ports/IMemoryStore)]
       (extend ProximumStore
         @proto-var
         {:connect!
@@ -283,8 +377,10 @@
              (entity->map (pull-entry db id))))
 
          :update-entry!
-         (fn [this id updates]
-           (let [conn (ensure-conn! this)
+         (fn [this id raw-updates]
+           (let [updates (strip-transient raw-updates)
+                 expires-at (expires->date updates)
+                 conn (ensure-conn! this)
                  db (d/db conn)
                  existing (pull-entry-raw db id)]
              (if-not existing
@@ -305,8 +401,8 @@
                                (assoc :entry/tags (set (map str (:tags updates))))
                                (:source updates)
                                (assoc :entry/source (str (:source updates)))
-                               (:expires-at updates)
-                               (assoc :entry/expires-at (:expires-at updates)))]
+                               expires-at
+                               (assoc :entry/expires-at expires-at))]
                  (d/transact conn {:tx-data [tx-data]})
                  (log/debug "[proximum] Entry updated" {:id id})
                  {:success? true :id id}))))
@@ -435,9 +531,11 @@
                {:store-type :proximum
                 :status     :connected
                 :backend    (get-in (:cfg this) [:store :backend])
-                :entry-count (or cnt 0)})
+                :entry-count (or cnt 0)
+                :capabilities capabilities})
              {:store-type :proximum
-              :status     :disconnected}))
+              :status     :disconnected
+              :capabilities capabilities}))
 
          :reset-store!
          (fn [this]
@@ -449,8 +547,13 @@
            (log/info "[proximum] Store reset")
            {:success? true})}))
 
+    ;; IMemoryStoreScan: complete enumeration for seal.migrate / `seal project`
+    (extend ProximumStore
+      ports/IMemoryStoreScan
+      {:scan-ids (fn [this opts] (scan-ids this (or opts {})))})
+
     ;; IMemoryStoreTemporal
-    (when-let [proto-var (try-resolve 'hive-mcp.protocols.memory/IMemoryStoreTemporal)]
+    (when-let [proto-var (try-resolve 'hive-spi.memory.ports/IMemoryStoreTemporal)]
       (extend ProximumStore
         @proto-var
         {:asof-entry
