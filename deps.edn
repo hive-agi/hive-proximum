@@ -5,15 +5,15 @@
         ;; hive-addon: the IAddon contract this addon implements. Depending on
         ;; the contract lib rather than on a host namespace is what lets any
         ;; host, hive-mcp or not, mount this jar.
-        io.github.hive-agi/hive-addon {:mvn/version "1.1.3"}
+        io.github.hive-agi/hive-addon {:mvn/version "1.1.8"}
 
         ;; hive-dsl — Result monad, rescue/guard DSL, ADTs
-        io.github.hive-agi/hive-dsl {:mvn/version "0.5.36"}
+        io.github.hive-agi/hive-dsl {:mvn/version "0.5.37"}
 
         ;; hive-spi — the lifecycle and memory ports the shutdown hook binds.
-        io.github.hive-agi/hive-spi {:mvn/version "1.4.4"}
+        io.github.hive-agi/hive-spi {:mvn/version "1.4.9"}
 
-        metosin/malli {:mvn/version "0.20.2"}
+        metosin/malli {:mvn/version "0.20.3"}
 
         ;; hive-events — event system for lifecycle.
         ;; Still a git coord: hive-events is not on Clojars yet. Flip to
@@ -30,7 +30,7 @@
 
         ;; Datahike — versioned Datalog with bitemporal support
         ;; Matches hive-mcp/hive-knowledge version for classpath compat
-        org.replikativ/datahike {:mvn/version "0.8.1903"}
+        org.replikativ/datahike {:mvn/version "0.8.1910"}
 
         ;; Proximum — persistent HNSW vector index. Powers the
         ;; hive-proximum.vec.* namespaces (Phase 2 of the storage
@@ -48,7 +48,7 @@
                       com.gfredericks/test.chuck
                       {:mvn/version "0.2.15"}
                       io.github.hive-agi/hive-test
-                      {:mvn/version "0.4.11"}
+                      {:mvn/version "0.5.0"}
                       io.github.hive-agi/hive-schemas
                       {:mvn/version "0.1.40"}}
          ;; Proximum's HNSW vector ops use the JDK incubator vector
