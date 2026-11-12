@@ -15,11 +15,9 @@
 
         metosin/malli {:mvn/version "0.20.3"}
 
-        ;; hive-events — event system for lifecycle.
-        ;; Still a git coord: hive-events is not on Clojars yet. Flip to
-        ;; {:mvn/version "..."} once it is published, otherwise hive-proximum
-        ;; cannot itself be released (a Maven artifact must not depend on a
-        ;; git coord — the pom would carry an unresolvable dependency).
+        ;; hive-events: event system for lifecycle (Clojars).
+        ;; Keep this a Maven coord: a released artifact must not depend on a
+        ;; git coord (the pom would carry an unresolvable dependency).
         io.github.hive-agi/hive-events
         {:mvn/version "0.5.19"}
 
